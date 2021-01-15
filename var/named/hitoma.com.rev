@@ -1,6 +1,6 @@
 $TTL 86400
 @ IN SOA dns-primary.hitoma.com. admin.hitoma.com. (
-                                            2020033002 ;Serial
+                                            2021011501 ;Serial
                                             3600 ;Refresh
                                             1800 ;Retry
                                             604800 ;Expire
@@ -9,14 +9,9 @@ $TTL 86400
 
 ;Name Server Information
 @ IN NS dns-primary.hitoma.int.
-dns-primary     IN      A       192.168.1.10
+dns-primary     IN      A       192.168.1.231
 ;Reverse lookup for Name Server
-10 IN PTR dns-primary.hitoma.com.
-
-; Example entries
-;PTR Record IP address to Hostname
-;50      IN      PTR     www.hitoma.local
-;60      IN      PTR     mail.hitoma.local
+231 IN PTR dns-primary.hitoma.com.
 
 1	IN	PTR	router.local.hitoma.com.
 1	IN	PTR	webca.local.hitoma.com.
