@@ -1,0 +1,35 @@
+$TTL 86400
+@ IN SOA dns-primary.hitoma.com. admin.hitoma.com. (
+                                                2020033002 ;Serial
+                                                3600 ;Refresh
+                                                1800 ;Retry
+                                                604800 ;Expire
+                                                86400 ;Minimum TTL
+)
+
+;Name Server Information
+@ IN NS dns-primary.hitoma.com.
+
+;IP Address for Name Server
+dns-primary IN A 192.168.1.10
+
+
+; Example Entries
+;Mail Server MX (Mail exchanger) Record
+;hitoma.local. IN MX 10 mail.hitoma.com.
+;A Record for the following Host name
+;www  IN   A   192.168.43.50
+;mail IN   A   192.168.43.60
+;CNAME Record
+;ftp  IN   CNAME www.hitoma.int
+
+
+;router IN   A   192.168.1.1
+router.local IN A 192.168.1.1
+webca.local IN A 192.168.1.10
+safeharbor.local IN A 192.168.1.128
+canon.local IN A 192.168.1.133
+nas.local IN A 192.168.1.122
+hubitat.local IN A 192.168.1.24
+octopi.local IN A 192.168.1.150
+* IN A 192.168.1.76
