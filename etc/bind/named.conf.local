@@ -9,7 +9,7 @@ include "/etc/bind/zones.rfc1918";
 //forward zone
 zone "hitoma.com" IN {
      type master;
-     file "hitoma.com.db";
+     file "/etc/bind/hitoma.com.db";
      allow-update { none; };
      allow-query { any; };
 };
@@ -17,7 +17,7 @@ zone "hitoma.com" IN {
 //backward zone
 zone "1.168.192.in-addr.arpa" IN {
      type master;
-     file "hitoma.com.rev";
+     file "/etc/bind/hitoma.com.rev";
      allow-update { none; };
      allow-query { any; };
 };
