@@ -14,7 +14,7 @@ $TTL 86400
 dns-primary IN A 192.168.1.231
 
 router.local IN A 192.168.1.1
-webca.local IN A 192.168.1.10
+webca.local IN A 192.168.1.76
 safeharbor.local IN A 192.168.1.128
 canon.local IN A 192.168.1.133
 nas.local IN A 192.168.1.122
