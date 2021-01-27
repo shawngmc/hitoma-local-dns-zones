@@ -26,6 +26,8 @@ jobs:
       - name: Merge in from develop
         run: |
           cd $GITHUB_WORKSPACE
+          git config user.email "shawngmc@gmail.com"
+          git config user.name "Shawn McNaughton (Github Action)"
           git remote update
           git fetch
           git checkout main
