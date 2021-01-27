@@ -7,8 +7,6 @@ on:
   # Triggers the workflow on push or pull request events but only for the main branch
   push:
     branches: [ develop ]
-  pull_request:
-    branches: [ main ]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -24,10 +22,28 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
+  
+      - name: Merge in from develop
+        run: |
+          git branch main
+          git merge develop
+
+      - name: Get timestamp for serial number
+        id: tstamp
+        run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
+      
+      - name: Place serial number
+        run: grep -lr --exclude-dir=".git" -e "SERIALNUMBER_PLACEHOLDER" . | xargs sed -i '' -e 's/SERIALNUMBER_PLACEHOLDER/${{steps.tstamp.outputs.date}}/g'
 
       - name: Install bind packages
         run: sudo apt install bind9 bind9utils
 
-      # Runs a set of commands using the runners shell
-      - name: Run a multi-line script
+      - name: Verify DNS entry validity
         run: $GITHUB_WORKSPACE/scripts/validate.sh
+
+      - name: Push the verified zones to main
+        run: |
+          git commit -a -m "Pushing verified zones ${{steps.tstamp.outputs.date}}"
+      
+      # TODO: Tag release with serial
+          
