@@ -52,6 +52,6 @@ jobs:
         run: |
           cd $GITHUB_WORKSPACE
           git commit -a -m "Pushing verified zones ${{steps.tstamp.outputs.date}}"
-      
-      # TODO: Tag release with serial
+          git tag -a "v${{steps.tstamp.outputs.date}}" -m "Verified release ${{steps.tstamp.outputs.date}}"
+          git push
           
