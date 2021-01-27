@@ -38,7 +38,7 @@ jobs:
       - name: Place serial number
         run: |
           cd $GITHUB_WORKSPACE
-          grep -lr --exclude-dir=".git" -e "SERIALNUMBER_PLACEHOLDER" . | xargs sed -i '' -e 's/SERIALNUMBER_PLACEHOLDER/${{steps.tstamp.outputs.date}}/g'
+          grep -lr --exclude-dir=".git" -e "SERIALNUMBERPLACEHOLDER" . | xargs sed -i '' -e 's/SERIALNUMBERPLACEHOLDER/${{steps.tstamp.outputs.date}}/g'
 
       - name: Install bind packages
         run: sudo apt install bind9 bind9utils
