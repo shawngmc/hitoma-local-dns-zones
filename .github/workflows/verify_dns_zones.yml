@@ -25,6 +25,7 @@ jobs:
   
       - name: Merge in from develop
         run: |
+          cd $GITHUB_WORKSPACE
           git checkout main
           git merge develop
 
@@ -45,6 +46,7 @@ jobs:
 
       - name: Push the verified zones to main
         run: |
+          cd $GITHUB_WORKSPACE
           git commit -a -m "Pushing verified zones ${{steps.tstamp.outputs.date}}"
       
       # TODO: Tag release with serial
