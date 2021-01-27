@@ -33,7 +33,9 @@ jobs:
         run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
       
       - name: Place serial number
-        run: grep -lr --exclude-dir=".git" -e "SERIALNUMBER_PLACEHOLDER" . | xargs sed -i '' -e 's/SERIALNUMBER_PLACEHOLDER/${{steps.tstamp.outputs.date}}/g'
+        run: |
+          cd $GITHUB_WORKSPACE
+          grep -lr --exclude-dir=".git" -e "SERIALNUMBER_PLACEHOLDER" . | xargs sed -i '' -e 's/SERIALNUMBER_PLACEHOLDER/${{steps.tstamp.outputs.date}}/g'
 
       - name: Install bind packages
         run: sudo apt install bind9 bind9utils
