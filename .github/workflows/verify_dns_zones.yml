@@ -30,8 +30,10 @@ jobs:
           git config user.name "Shawn McNaughton (Github Action)"
           git remote update
           git fetch
+          mkdir ../tmp/
+          cp -R * ../tmp/
           git checkout main
-          git merge develop --allow-unrelated-histories
+          cp -R ../tmp/* ./
 
       - name: Get timestamp for serial number
         id: tstamp
