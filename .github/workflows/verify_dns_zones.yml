@@ -35,7 +35,7 @@ jobs:
 
       - name: Get timestamp for serial number
         id: tstamp
-        run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
+        run: echo "::set-output name=date::$(date +%s)"
       
       - name: Place serial number
         run: |
