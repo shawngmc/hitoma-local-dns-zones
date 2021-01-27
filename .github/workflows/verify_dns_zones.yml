@@ -53,5 +53,5 @@ jobs:
           cd $GITHUB_WORKSPACE
           git commit -a -m "Pushing verified zones ${{steps.tstamp.outputs.date}}"
           git tag -a "v${{steps.tstamp.outputs.date}}" -m "Verified release ${{steps.tstamp.outputs.date}}"
-          git push
+          git push --tags
           
