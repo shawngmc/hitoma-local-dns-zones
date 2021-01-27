@@ -39,7 +39,7 @@ jobs:
       
       - name: Place serial number
         run: |
-          cd $GITHUB_WORKSPACE
+          cd $GITHUB_WORKSPACE/etc/bind
           sed -i 's/SERIALNUMBERPLACEHOLDER/${{steps.tstamp.outputs.date}}/g' *
 
       - name: Install bind packages
