@@ -19,4 +19,5 @@ dns-primary     IN      A       192.168.1.231
 1       IN      PTR     canon.local.hitoma.com.
 1       IN      PTR     nas.local.hitoma.com.
 1       IN      PTR     hubitat.local.hitoma.com.
+1       IN      PTR     ca.local.hitoma.com.
 ;1       IN      PTR     octopi.local.hitoma.com.
