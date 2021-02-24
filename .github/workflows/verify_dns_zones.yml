@@ -25,6 +25,7 @@ jobs:
   
       - name: Merge in from develop
         run: |
+          echo $GITHUB_ACTOR
           cd $GITHUB_WORKSPACE
           git config user.email "shawngmc@gmail.com"
           git config user.name "Shawn McNaughton (Github Action)"
