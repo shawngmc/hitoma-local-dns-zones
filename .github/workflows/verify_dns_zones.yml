@@ -71,10 +71,20 @@ jobs:
           mkdir builds
           tar -czvf builds/zones.tar.gz ./*
       - name: Create Release
-        uses: djnicholson/release-action@v2.11
+        uses: "marvinpinto/action-automatic-releases@latest"
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          release-name: 'DNS Zones v ${{ steps.tstamp.outputs.semverdate }}.${{ steps.tstamp.outputs.epochdate }}'
-          tag-name: 'v${{ steps.tstamp.outputs.semverdate }}.${{ steps.tstamp.outputs.epochdate }}'
-          asset-name: 'zones-v${{ steps.tstamp.outputs.epochdate }}.tar.gz'
-          file: 'builds/zones.tar.gz'
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "latest"
+          prerelease: false
+          title: 'DNS Zones v ${{ steps.tstamp.outputs.semverdate }}.${{ steps.tstamp.outputs.epochdate }}'
+          files: |
+            LICENSE.txt
+            *.jar
+#       - name: Attach File To Release
+#         uses: djnicholson/release-action@v2.11
+#         with:
+#           token: ${{ secrets.GITHUB_TOKEN }}
+#           release-name: 'DNS Zones v ${{ steps.tstamp.outputs.semverdate }}.${{ steps.tstamp.outputs.epochdate }}'
+#           tag-name: 'v${{ steps.tstamp.outputs.semverdate }}.${{ steps.tstamp.outputs.epochdate }}'
+#           asset-name: 'zones-v${{ steps.tstamp.outputs.epochdate }}.tar.gz'
+#           file: 'builds/zones.tar.gz'
