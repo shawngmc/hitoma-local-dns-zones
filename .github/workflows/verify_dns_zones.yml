@@ -30,42 +30,42 @@ jobs:
       - name: Create Pull Request
         id: cpr
         uses: peter-evans/create-pull-request@v3.8.2
-  version:
-    needs: createpr
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout PR
-        uses: actions/checkout@v2
-        with:
-          ref: create-pull-request/patch
+#   version:
+#     needs: createpr
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout PR
+#         uses: actions/checkout@v2
+#         with:
+#           ref: create-pull-request/patch
           
-      - name: Generate Timestamp
-        id: tstamp
-        run: echo "::set-output name=date::$(date +%s)"
+#       - name: Generate Timestamp
+#         id: tstamp
+#         run: echo "::set-output name=date::$(date +%s)"
       
-      - name: Place Timestamp As Serial Number
-        run: |
-          cd $GITHUB_WORKSPACE/etc/bind
-          sed -i 's/SERIALNUMBERPLACEHOLDER/${{steps.tstamp.outputs.date}}/g' *
+#       - name: Place Timestamp As Serial Number
+#         run: |
+#           cd $GITHUB_WORKSPACE/etc/bind
+#           sed -i 's/SERIALNUMBERPLACEHOLDER/${{steps.tstamp.outputs.date}}/g' *
           
-      - name: Commit Serial-stamped Files
-        run: |
-          cd $GITHUB_WORKSPACE
-          git config user.email "shawngmc@gmail.com"
-          git config user.name "Shawn McNaughton (Github Action)"
-          git commit -a -m "Setting zone version to ${{steps.tstamp.outputs.date}}"
-          git push
+#       - name: Commit Serial-stamped Files
+#         run: |
+#           cd $GITHUB_WORKSPACE
+#           git config user.email "shawngmc@gmail.com"
+#           git config user.name "Shawn McNaughton (Github Action)"
+#           git commit -a -m "Setting zone version to ${{steps.tstamp.outputs.date}}"
+#           git push
           
-      - name: Fix Merge Conflict
-        run: |
-          git fetch origin
-          git checkout main
-          git checkout create-pull-request/patch
-          git merge main --allow-unrelated-histories -Xours
-          git commit -a -m "Resolving version merge conflict"
-          git push
+#       - name: Fix Merge Conflict
+#         run: |
+#           git fetch origin
+#           git checkout main
+#           git checkout create-pull-request/patch
+#           git merge main --allow-unrelated-histories -Xours
+#           git commit -a -m "Resolving version merge conflict"
+#           git push
   verify: 
-    needs: version
+    needs: createpr
     runs-on: ubuntu-latest
     steps:
       - name: Checkout PR
