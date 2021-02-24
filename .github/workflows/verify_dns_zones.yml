@@ -59,7 +59,7 @@ jobs:
       - name: Fix Merge Conflict
         run: |
           git fetch origin
-          git checkout mains
+          git checkout main
           git checkout create-pull-request/patch
           git merge main
           grep -lr '<<<<<<<' . | xargs git checkout --ours
