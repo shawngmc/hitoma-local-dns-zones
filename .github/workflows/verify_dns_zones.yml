@@ -45,7 +45,7 @@ jobs:
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v3.8.2
         with:
-          base: "master"
+          base: "main"
 
       - name: Approve PR
         uses: hmarr/auto-approve-action@v2.0.0
