@@ -61,7 +61,7 @@ jobs:
           git fetch origin
           git checkout main
           git checkout create-pull-request/patch
-          git merge main
+          git merge main --allow-unrelated-histories
           grep -lr '<<<<<<<' . | xargs git checkout --ours
           git commit -a -m "Resolving version merge conflict"
           git push
