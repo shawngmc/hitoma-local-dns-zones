@@ -107,6 +107,29 @@ jobs:
           merge-method: 'squash'
           min-approvals: 0
           base-ref: 'main'
+  release:
+    needs: promote
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate Timestamp
+        id: tstamp
+        run: echo "::set-output name=date::$(date +%s)"
+      - name: Place Timestamp As Serial Number
+        run: |
+          cd $GITHUB_WORKSPACE/etc/bind
+          sed -i 's/SERIALNUMBERPLACEHOLDER/${{steps.tstamp.outputs.date}}/g' *
+      - name: Make Archive
+        run: |
+          cd $GITHUB_WORKSPACE
+          tar -czvf zones.tar.gz ./*
+      - name: Create Release
+        uses: djnicholson/release-action@v2.11
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          release-name: 'DNS Zones v ${{ steps.tstamp.outputs.date }}'
+          tag-name: 'v${{ steps.tstamp.outputs.date }}'
+          asset-name: 'zones-v${{ steps.tstamp.outputs.date }}.tar.gz'
+          file: '${{GITHUB_WORKSPACE}}/zones.tar.gz'
 
 #       - name: Push the verified zones to main
 #         run: |
