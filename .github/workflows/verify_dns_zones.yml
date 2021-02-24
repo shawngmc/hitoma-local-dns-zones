@@ -75,6 +75,11 @@ jobs:
 
       - name: Install Bind
         run: sudo apt install bind9 bind9utils
+        
+      - name: Place Temporary Serial Number
+        run: |
+          cd $GITHUB_WORKSPACE/etc/bind
+          sed -i 's/SERIALNUMBERPLACEHOLDER/1000/g' *
 
       - name: Verify DNS Entry Validity
         run: $GITHUB_WORKSPACE/scripts/validate.sh
