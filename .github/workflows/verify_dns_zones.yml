@@ -22,15 +22,16 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
         with:
-          ref: develop
+          ref: main
+          
+      - name: Reset base branch
+        run: |
+          git fetch origin develop:develop
+          git reset --hard develop
 
       - name: Get timestamp for serial number
         id: tstamp
         run: echo "::set-output name=date::$(date +%s)"
-      
-      - name: Debug
-        run: |
-          echo
       
       - name: Place serial number
         run: |
