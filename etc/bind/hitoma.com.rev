@@ -1,6 +1,6 @@
 $TTL 86400
 @ IN SOA dns-primary.hitoma.com. admin.hitoma.com. (
-                                            SERIALNUMBERPLACEHOLDER ;Serial
+                                            1614146329 ;Serial
                                             3600 ;Refresh
                                             1800 ;Retry
                                             604800 ;Expire

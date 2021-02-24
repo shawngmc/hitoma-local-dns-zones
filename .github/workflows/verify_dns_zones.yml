@@ -92,7 +92,7 @@ jobs:
         with:
           merge-method: 'squash'
           min-approvals: 0
-          base-ref: 'develop'
+          base-ref: 'main'
 
 #       - name: Push the verified zones to main
 #         run: |
