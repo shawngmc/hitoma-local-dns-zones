@@ -53,7 +53,8 @@ jobs:
       - name: Push the verified zones to main
         run: |
           cd $GITHUB_WORKSPACE
-          git tag -a "v${{steps.tstamp.outputs.date}}" -m "Verified release ${{steps.tstamp.outputs.date}}"
           git commit -a -m "Pushing verified zones ${{steps.tstamp.outputs.date}}"
+          git push
+          git tag -a "v${{steps.tstamp.outputs.date}}" -m "Verified release ${{steps.tstamp.outputs.date}}"
           git push origin "v${{steps.tstamp.outputs.date}}"
           
