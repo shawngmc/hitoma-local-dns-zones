@@ -13,11 +13,8 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  build:
-    # The type of runner that the job will run on
+  verify: 
     runs-on: ubuntu-latest
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
@@ -43,7 +40,32 @@ jobs:
 
       - name: Verify DNS entry validity
         run: $GITHUB_WORKSPACE/scripts/validate.sh
-  
+  promote:
+    needs: verify
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+        with:
+          ref: main
+          
+      - name: Reset base branch
+        run: |
+          git fetch origin develop:develop
+          git reset --hard develop
+
+      - name: Get timestamp for serial number
+        id: tstamp
+        run: echo "::set-output name=date::$(date +%s)"
+      
+      - name: Place serial number
+        run: |
+          cd $GITHUB_WORKSPACE/etc/bind
+          sed -i 's/SERIALNUMBERPLACEHOLDER/${{steps.tstamp.outputs.date}}/g' *
+          
       # Create a pull request
       - name: Create Pull Request
         id: cpr
