@@ -13,7 +13,6 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
   build:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
@@ -22,18 +21,6 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
-  
-      - name: Merge in from develop
-        run: |
-          cd $GITHUB_WORKSPACE
-          git config user.email "shawngmc@gmail.com"
-          git config user.name "Shawn McNaughton (Github Action)"
-          git remote update
-          git fetch
-          mkdir ../tmp/
-          cp -R * ../tmp/
-          git checkout main
-          cp -R ../tmp/* ./
 
       - name: Get timestamp for serial number
         id: tstamp
@@ -49,6 +36,28 @@ jobs:
 
       - name: Verify DNS entry validity
         run: $GITHUB_WORKSPACE/scripts/validate.sh
+  
+      # Create a pull request
+      - name: pull-request-action
+        uses: vsoch/pull-request-action@1.0.6
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH_PREFIX: "develop"
+          PULL_REQUEST_BRANCH: "master"
+
+      - name: Approve PR
+        uses: hmarr/auto-approve-action@v2.0.0
+        with:
+          github-token: "${{ secrets.GITHUB_TOKEN }}"
+
+      - name: close-pull-request
+        uses: davideviolante/pr-automerge-action@v1.2.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          merge-method: 'squash' # Default 'squash'
+          min-approvals: 2 # Default 2
+          base-ref: 'dev' # Default 'dev'
 
       - name: Push the verified zones to main
         run: |
