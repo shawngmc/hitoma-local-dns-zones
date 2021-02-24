@@ -26,6 +26,10 @@ jobs:
         id: tstamp
         run: echo "::set-output name=date::$(date +%s)"
       
+      - name: Debug
+        run: |
+          echo
+      
       - name: Place serial number
         run: |
           cd $GITHUB_WORKSPACE/etc/bind
@@ -39,7 +43,7 @@ jobs:
   
       # Create a pull request
       - name: pull-request-action
-        uses: vsoch/pull-request-action@1.0.6
+        uses: vsoch/pull-request-action@1.0.15
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH_PREFIX: "develop"
