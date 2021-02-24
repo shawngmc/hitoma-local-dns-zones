@@ -13,14 +13,18 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  build:
-    # The type of runner that the job will run on
+  verify: 
     runs-on: ubuntu-latest
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
+        with:
+          ref: main
+          
+      - name: Reset base branch
+        run: |
+          git fetch origin develop:develop
+          git reset --hard develop
 
       - name: Get timestamp for serial number
         id: tstamp
@@ -36,34 +40,68 @@ jobs:
 
       - name: Verify DNS entry validity
         run: $GITHUB_WORKSPACE/scripts/validate.sh
-  
-      # Create a pull request
-      - name: pull-request-action
-        uses: vsoch/pull-request-action@1.0.6
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          BRANCH_PREFIX: "develop"
-          PULL_REQUEST_BRANCH: "master"
+  promote:
+    needs: verify
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
 
-      - name: Approve PR
-        uses: hmarr/auto-approve-action@v2.0.0
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
         with:
-          github-token: "${{ secrets.GITHUB_TOKEN }}"
-
-      - name: close-pull-request
-        uses: davideviolante/pr-automerge-action@v1.2.1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          merge-method: 'squash' # Default 'squash'
-          min-approvals: 2 # Default 2
-          base-ref: 'dev' # Default 'dev'
-
-      - name: Push the verified zones to main
+          ref: main
+          
+      - name: Reset base branch
         run: |
-          cd $GITHUB_WORKSPACE
-          git commit -a -m "Pushing verified zones ${{steps.tstamp.outputs.date}}"
-          git push
-          git tag -a "v${{steps.tstamp.outputs.date}}" -m "Verified release ${{steps.tstamp.outputs.date}}"
-          git push origin "v${{steps.tstamp.outputs.date}}"
+          git fetch origin develop:develop
+          git reset --hard develop
+
+      - name: Get timestamp for serial number
+        id: tstamp
+        run: echo "::set-output name=date::$(date +%s)"
+      
+      - name: Place serial number
+        run: |
+          cd $GITHUB_WORKSPACE/etc/bind
+          sed -i 's/SERIALNUMBERPLACEHOLDER/${{steps.tstamp.outputs.date}}/g' *
+          
+      # Create a pull request
+      - name: Create Pull Request
+        id: cpr
+        uses: peter-evans/create-pull-request@v3.8.2
+        
+      - name: Check outputs
+        run: |
+          echo "Pull Request Number - ${{ steps.cpr.outputs.pull-request-number }}"
+          echo "Pull Request URL - ${{ steps.cpr.outputs.pull-request-url }}"
+
+      - name: merge a pull request without any need of a label (automatic merge)
+        uses: sudo-bot/action-pull-request-merge@v1.1.1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          number: ${{ steps.cpr.outputs.pull-request-number }}
+          allowed-usernames-regex: ^shawngmc$
+
+#       - name: Auto-Merge Pull Request
+#         uses: reitermarkus/automerge@v1.5.1
+#         with:
+#           pull-request: ${{ steps.cpr.outputs.pull-request-number }}
+
+#       - name: close-pull-request
+#         uses: davideviolante/pr-automerge-action@v1.2.1
+#         env:
+#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#         with:
+#           merge-method: 'squash' # Default 'squash'
+#           min-approvals: 2 # Default 2
+#           base-ref: 'dev' # Default 'dev'
+
+#       - name: Push the verified zones to main
+#         run: |
+#           cd $GITHUB_WORKSPACE
+#           git commit -a -m "Pushing verified zones ${{steps.tstamp.outputs.date}}"
+#           git push
+#           git tag -a "v${{steps.tstamp.outputs.date}}" -m "Verified release ${{steps.tstamp.outputs.date}}"
+#           git push origin "v${{steps.tstamp.outputs.date}}"
           
