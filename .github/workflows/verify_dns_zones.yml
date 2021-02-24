@@ -47,26 +47,30 @@ jobs:
         uses: peter-evans/create-pull-request@v3.8.2
         with:
           base: "main"
-
-      - name: Auto-Merge Pull Request
-        uses: reitermarkus/automerge@v1.5.1
-        with:
-          pull-request: ${{ steps.cpr.outputs.pull-request-number }}
-
-      - name: close-pull-request
-        uses: davideviolante/pr-automerge-action@v1.2.1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          merge-method: 'squash' # Default 'squash'
-          min-approvals: 2 # Default 2
-          base-ref: 'dev' # Default 'dev'
-
-      - name: Push the verified zones to main
+      - name: Check outputs
         run: |
-          cd $GITHUB_WORKSPACE
-          git commit -a -m "Pushing verified zones ${{steps.tstamp.outputs.date}}"
-          git push
-          git tag -a "v${{steps.tstamp.outputs.date}}" -m "Verified release ${{steps.tstamp.outputs.date}}"
-          git push origin "v${{steps.tstamp.outputs.date}}"
+          echo "Pull Request Number - ${{ steps.cpr.outputs.pull-request-number }}"
+          echo "Pull Request URL - ${{ steps.cpr.outputs.pull-request-url }}"
+
+#       - name: Auto-Merge Pull Request
+#         uses: reitermarkus/automerge@v1.5.1
+#         with:
+#           pull-request: ${{ steps.cpr.outputs.pull-request-number }}
+
+#       - name: close-pull-request
+#         uses: davideviolante/pr-automerge-action@v1.2.1
+#         env:
+#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#         with:
+#           merge-method: 'squash' # Default 'squash'
+#           min-approvals: 2 # Default 2
+#           base-ref: 'dev' # Default 'dev'
+
+#       - name: Push the verified zones to main
+#         run: |
+#           cd $GITHUB_WORKSPACE
+#           git commit -a -m "Pushing verified zones ${{steps.tstamp.outputs.date}}"
+#           git push
+#           git tag -a "v${{steps.tstamp.outputs.date}}" -m "Verified release ${{steps.tstamp.outputs.date}}"
+#           git push origin "v${{steps.tstamp.outputs.date}}"
           
