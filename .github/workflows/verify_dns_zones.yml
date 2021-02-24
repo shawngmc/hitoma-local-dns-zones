@@ -78,8 +78,7 @@ jobs:
           prerelease: false
           title: 'DNS Zones v ${{ steps.tstamp.outputs.semverdate }}.${{ steps.tstamp.outputs.epochdate }}'
           files: |
-            LICENSE.txt
-            *.jar
+            builds/zones.tar.gz
 #       - name: Attach File To Release
 #         uses: djnicholson/release-action@v2.11
 #         with:
