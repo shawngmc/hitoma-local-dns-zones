@@ -121,7 +121,8 @@ jobs:
       - name: Make Archive
         run: |
           cd $GITHUB_WORKSPACE
-          tar -czvf zones.tar.gz ./*
+          mkdir builds
+          tar -czvf builds/zones.tar.gz ./*
       - name: Create Release
         uses: djnicholson/release-action@v2.11
         with:
@@ -129,7 +130,7 @@ jobs:
           release-name: 'DNS Zones v ${{ steps.tstamp.outputs.date }}'
           tag-name: 'v${{ steps.tstamp.outputs.date }}'
           asset-name: 'zones-v${{ steps.tstamp.outputs.date }}.tar.gz'
-          file: '${{GITHUB_WORKSPACE}}/zones.tar.gz'
+          file: 'builds/zones.tar.gz'
 
 #       - name: Push the verified zones to main
 #         run: |
