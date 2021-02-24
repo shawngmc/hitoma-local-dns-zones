@@ -69,14 +69,14 @@ jobs:
         run: |
           cd $GITHUB_WORKSPACE
           mkdir builds
-          tar -czvf builds/zones.tar.gz ./*
+          tar -czvf builds/zones.tar.gz ./etc
       - name: Create Release
         uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           automatic_release_tag: "latest"
           prerelease: false
-          title: 'DNS Zones v ${{ steps.tstamp.outputs.semverdate }}.${{ steps.tstamp.outputs.epochdate }}'
+          title: 'DNS Zones v${{ steps.tstamp.outputs.semverdate }}.${{ steps.tstamp.outputs.epochdate }}'
           files: |
             builds/zones.tar.gz
 #       - name: Attach File To Release
