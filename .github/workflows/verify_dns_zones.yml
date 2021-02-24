@@ -58,11 +58,13 @@ jobs:
           ref: main
       - name: Generate Timestamp
         id: tstamp
-        run: echo "::set-output name=date::$(date +%s)"
+        run: |
+          echo "::set-output name=epochdate::$(date +%s)"
+          echo "::set-output name=semverdate::$(date +%Y%m%d.%H%M.%S)"
       - name: Place Timestamp As Serial Number
         run: |
-          cd $GITHUB_WORKSPACE/etc/bind
-          sed -i 's/SERIALNUMBERPLACEHOLDER/${{steps.tstamp.outputs.date}}/g' *
+          cd $GITHUB_WORKSPACE/etc/bind/
+          sed -i 's/SERIALNUMBERPLACEHOLDER/${{steps.tstamp.outputs.epochdate}}/g' *
       - name: Make Archive
         run: |
           cd $GITHUB_WORKSPACE
@@ -72,7 +74,7 @@ jobs:
         uses: djnicholson/release-action@v2.11
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          release-name: 'DNS Zones v ${{ steps.tstamp.outputs.date }}'
-          tag-name: 'v${{ steps.tstamp.outputs.date }}'
-          asset-name: 'zones-v${{ steps.tstamp.outputs.date }}.tar.gz'
+          release-name: 'DNS Zones v ${{ steps.tstamp.outputs.semverdate }}.${{ steps.tstamp.outputs.epochdate }}'
+          tag-name: 'v${{ steps.tstamp.outputs.semverdate }}.${{ steps.tstamp.outputs.epochdate }}'
+          asset-name: 'zones-v${{ steps.tstamp.outputs.epochdate }}.tar.gz'
           file: 'builds/zones.tar.gz'
