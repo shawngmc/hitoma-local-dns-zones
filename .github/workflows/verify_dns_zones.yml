@@ -13,46 +13,15 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  verify: 
+  createpr:
     runs-on: ubuntu-latest
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
+      - name: Checkout Project
+        uses: actions/checkout@v2
         with:
           ref: main
           
-      - name: Reset base branch
-        run: |
-          git fetch origin develop:develop
-          git reset --hard develop
-
-      - name: Get timestamp for serial number
-        id: tstamp
-        run: echo "::set-output name=date::$(date +%s)"
-      
-      - name: Place serial number
-        run: |
-          cd $GITHUB_WORKSPACE/etc/bind
-          sed -i 's/SERIALNUMBERPLACEHOLDER/${{steps.tstamp.outputs.date}}/g' *
-
-      - name: Install bind packages
-        run: sudo apt install bind9 bind9utils
-
-      - name: Verify DNS entry validity
-        run: $GITHUB_WORKSPACE/scripts/validate.sh
-  promote:
-    needs: verify
-    # The type of runner that the job will run on
-    runs-on: ubuntu-latest
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
-    steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
-        with:
-          ref: main
-          
-      - name: Reset base branch
+      - name: Reset Branch To Force Change Detection
         run: |
           git fetch origin develop:develop
           git reset --hard develop
@@ -61,48 +30,69 @@ jobs:
       - name: Create Pull Request
         id: cpr
         uses: peter-evans/create-pull-request@v3.8.2
+  version:
+    needs: createpr
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR
+        uses: actions/checkout@v2
+        with:
+          ref: create-pull-request/patch
           
-      - name: Reset base branch
-        run: |
-          git checkout create-pull-request/patch
-
-      - name: Get timestamp for serial number
+      - name: Generate Timestamp
         id: tstamp
         run: echo "::set-output name=date::$(date +%s)"
       
-      - name: Place serial number
+      - name: Place Timestamp As Serial Number
         run: |
           cd $GITHUB_WORKSPACE/etc/bind
           sed -i 's/SERIALNUMBERPLACEHOLDER/${{steps.tstamp.outputs.date}}/g' *
           
-      - name: Commit all serial-modified files
+      - name: Commit Serial-stamped Files
         run: |
           cd $GITHUB_WORKSPACE
           git config user.email "shawngmc@gmail.com"
           git config user.name "Shawn McNaughton (Github Action)"
           git commit -a -m "Setting zone version to ${{steps.tstamp.outputs.date}}"
           git push
-      
-      - name: merge a pull request without any need of a label (automatic merge)
-        uses: sudo-bot/action-pull-request-merge@v1.1.1
+  verify: 
+    needs: version
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR
+        uses: actions/checkout@v2
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          number: ${{ steps.cpr.outputs.pull-request-number }}
-          allowed-usernames-regex: ^shawngmc$
+          ref: create-pull-request/patch
+
+      - name: Install Bind
+        run: sudo apt install bind9 bind9utils
+
+      - name: Verify DNS Entry Validity
+        run: $GITHUB_WORKSPACE/scripts/validate.sh
+  promote:
+    needs: verify
+    runs-on: ubuntu-latest
+    steps:
+#       - name: merge a pull request without any need of a label (automatic merge)
+#         uses: sudo-bot/action-pull-request-merge@v1.1.1
+#         with:
+#           github-token: ${{ secrets.GITHUB_TOKEN }}
+#           number: ${{ steps.cpr.outputs.pull-request-number }}
+#           allowed-usernames-regex: ^shawngmc$
 
 #       - name: Auto-Merge Pull Request
 #         uses: reitermarkus/automerge@v1.5.1
 #         with:
 #           pull-request: ${{ steps.cpr.outputs.pull-request-number }}
 
-#       - name: close-pull-request
-#         uses: davideviolante/pr-automerge-action@v1.2.1
-#         env:
-#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#         with:
-#           merge-method: 'squash' # Default 'squash'
-#           min-approvals: 2 # Default 2
-#           base-ref: 'dev' # Default 'dev'
+      - name: Merge and Close PR
+        uses: davideviolante/pr-automerge-action@v1.2.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          merge-method: 'squash'
+          min-approvals: 0
+          base-ref: 'develop'
 
 #       - name: Push the verified zones to main
 #         run: |
