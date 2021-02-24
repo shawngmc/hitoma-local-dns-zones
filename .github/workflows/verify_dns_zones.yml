@@ -51,7 +51,7 @@ jobs:
       - name: Auto-Merge Pull Request
         uses: reitermarkus/automerge@v1.5.1
         with:
-          pull-request: steps.cpr.outputs.pull-request-number
+          pull-request: ${{ steps.cpr.outputs.pull-request-number }}
 
       - name: close-pull-request
         uses: davideviolante/pr-automerge-action@v1.2.1
