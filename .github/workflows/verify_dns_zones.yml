@@ -55,6 +55,15 @@ jobs:
           git config user.name "Shawn McNaughton (Github Action)"
           git commit -a -m "Setting zone version to ${{steps.tstamp.outputs.date}}"
           git push
+          
+      - name: Fix Merge Conflict
+        run: |
+          git fetch origin
+          git checkout -b create-pull-request/patch origin/create-pull-request/patch
+          git merge main
+          grep -lr '<<<<<<<' . | xargs git checkout --ours
+          git commit -a -m "Resolving version merge conflict"
+          git push
   verify: 
     needs: version
     runs-on: ubuntu-latest
