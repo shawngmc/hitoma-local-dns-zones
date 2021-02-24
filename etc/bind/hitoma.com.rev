@@ -15,7 +15,6 @@ dns-primary     IN      A       192.168.1.231
 
 1	IN	PTR	router.local.hitoma.com.
 1	IN	PTR	webca.local.hitoma.com.
-;1	IN	PTR	safeharbor.local.hitoma.com.
 1       IN      PTR     canon.local.hitoma.com.
 1       IN      PTR     nas.local.hitoma.com.
 1       IN      PTR     hubitat.local.hitoma.com.
