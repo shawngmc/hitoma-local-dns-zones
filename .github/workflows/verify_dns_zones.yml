@@ -64,6 +64,7 @@ jobs:
       - name: Place Timestamp As Serial Number
         run: |
           cd $GITHUB_WORKSPACE/etc/bind/
+          echo ${{steps.tstamp.outputs.epochdate}}
           sed -i 's/SERIALNUMBERPLACEHOLDER/${{steps.tstamp.outputs.epochdate}}/g' *
       - name: Make Archive
         run: |
@@ -79,6 +80,9 @@ jobs:
           title: 'DNS Zones v${{ steps.tstamp.outputs.semverdate }}.${{ steps.tstamp.outputs.epochdate }}'
           files: |
             builds/zones.tar.gz
+      - name: Timestamp debug
+        run: |
+          echo ${{steps.tstamp.outputs.epochdate}}
 #       - name: Attach File To Release
 #         uses: djnicholson/release-action@v2.11
 #         with:
