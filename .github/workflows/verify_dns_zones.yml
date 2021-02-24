@@ -56,6 +56,15 @@ jobs:
         run: |
           git fetch origin develop:develop
           git reset --hard develop
+          
+      # Create a pull request
+      - name: Create Pull Request
+        id: cpr
+        uses: peter-evans/create-pull-request@v3.8.2
+          
+      - name: Reset base branch
+        run: |
+          git checkout create-pull-request/patch
 
       - name: Get timestamp for serial number
         id: tstamp
@@ -66,16 +75,12 @@ jobs:
           cd $GITHUB_WORKSPACE/etc/bind
           sed -i 's/SERIALNUMBERPLACEHOLDER/${{steps.tstamp.outputs.date}}/g' *
           
-      # Create a pull request
-      - name: Create Pull Request
-        id: cpr
-        uses: peter-evans/create-pull-request@v3.8.2
-        
-      - name: Check outputs
+      - name: Commit all serial-modified files
         run: |
-          echo "Pull Request Number - ${{ steps.cpr.outputs.pull-request-number }}"
-          echo "Pull Request URL - ${{ steps.cpr.outputs.pull-request-url }}"
-
+          cd $GITHUB_WORKSPACE
+          git commit -a -m "Setting zone version to ${{steps.tstamp.outputs.date}}"
+          git push
+      
       - name: merge a pull request without any need of a label (automatic merge)
         uses: sudo-bot/action-pull-request-merge@v1.1.1
         with:
