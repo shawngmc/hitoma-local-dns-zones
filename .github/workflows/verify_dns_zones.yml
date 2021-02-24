@@ -65,7 +65,9 @@ jobs:
         run: |
           cd $GITHUB_WORKSPACE/etc/bind/
           echo ${{steps.tstamp.outputs.epochdate}}
+          cat hitoma.com.db
           sed -i 's/SERIALNUMBERPLACEHOLDER/${{steps.tstamp.outputs.epochdate}}/g' *
+          cat hitoma.com.db
       - name: Make Archive
         run: |
           cd $GITHUB_WORKSPACE
