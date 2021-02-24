@@ -59,7 +59,7 @@ jobs:
       - name: Fix Merge Conflict
         run: |
           git fetch origin
-          git checkout -b create-pull-request/patch origin/create-pull-request/patch
+          git checkout create-pull-request/patch
           git merge main
           grep -lr '<<<<<<<' . | xargs git checkout --ours
           git commit -a -m "Resolving version merge conflict"
