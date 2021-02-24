@@ -43,14 +43,15 @@ jobs:
   
       # Create a pull request
       - name: Create Pull Request
+        id: cpr
         uses: peter-evans/create-pull-request@v3.8.2
         with:
           base: "main"
 
-      - name: Approve PR
-        uses: hmarr/auto-approve-action@v2.0.0
+      - name: Auto-Merge Pull Request
+        uses: reitermarkus/automerge@v1.5.1
         with:
-          github-token: "${{ secrets.GITHUB_TOKEN }}"
+          pull-request: steps.cpr.outputs.pull-request-number
 
       - name: close-pull-request
         uses: davideviolante/pr-automerge-action@v1.2.1
