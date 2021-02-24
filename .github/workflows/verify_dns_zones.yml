@@ -42,12 +42,10 @@ jobs:
         run: $GITHUB_WORKSPACE/scripts/validate.sh
   
       # Create a pull request
-      - name: pull-request-action
-        uses: vsoch/pull-request-action@1.0.15
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          BRANCH_PREFIX: "develop"
-          PULL_REQUEST_BRANCH: "master"
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v3.8.2
+        with:
+          base: "master"
 
       - name: Approve PR
         uses: hmarr/auto-approve-action@v2.0.0
