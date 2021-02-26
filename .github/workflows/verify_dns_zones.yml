@@ -48,8 +48,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           test: true
           reviewers: false
-          labels: ready, merge
-          blocking_labels: do not merge
+          labels:
+          blocking_labels:
           checks_enabled: true
           method: squash
           delete_source_branch: true
