@@ -1,4 +1,4 @@
-name: Verify and Publish
+name: Promote
 
 on:
   pull_request:
