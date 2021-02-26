@@ -20,6 +20,8 @@ jobs:
       - name: Create Pull Request
         id: cpr
         uses: peter-evans/create-pull-request@v3.8.2
+        with:
+          labels: ready
   verify: 
     needs: createpr
     runs-on: ubuntu-latest
@@ -39,15 +41,17 @@ jobs:
   promote:
     needs: verify
     runs-on: ubuntu-latest
-    steps:
-      - name: Merge and Close PR
-        uses: davideviolante/pr-automerge-action@v1.2.1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Integration check
+        uses: squalrus/merge-bot@v0.1.0
         with:
-          merge-method: 'squash'
-          min-approvals: 0
-          base-ref: 'main'
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          test: true
+          reviewers: false
+          labels: ready, merge
+          blocking_labels: do not merge
+          checks_enabled: true
+          method: squash
+          delete_source_branch: true
   release:
     needs: promote
     runs-on: ubuntu-latest
@@ -85,11 +89,3 @@ jobs:
       - name: Timestamp debug
         run: |
           echo ${{steps.tstamp.outputs.epochdate}}
-#       - name: Attach File To Release
-#         uses: djnicholson/release-action@v2.11
-#         with:
-#           token: ${{ secrets.GITHUB_TOKEN }}
-#           release-name: 'DNS Zones v ${{ steps.tstamp.outputs.semverdate }}.${{ steps.tstamp.outputs.epochdate }}'
-#           tag-name: 'v${{ steps.tstamp.outputs.semverdate }}.${{ steps.tstamp.outputs.epochdate }}'
-#           asset-name: 'zones-v${{ steps.tstamp.outputs.epochdate }}.tar.gz'
-#           file: 'builds/zones.tar.gz'
