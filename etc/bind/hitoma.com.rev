@@ -1,6 +1,6 @@
 $TTL 86400
 @ IN SOA dns-primary.hitoma.com. admin.hitoma.com. (
-                                            1614146329 ;Serial
+                                            SERIALNUMBERPLACEHOLDER ;Serial
                                             3600 ;Refresh
                                             1800 ;Retry
                                             604800 ;Expire
@@ -15,9 +15,8 @@ dns-primary     IN      A       192.168.1.231
 
 1	IN	PTR	router.local.hitoma.com.
 1	IN	PTR	webca.local.hitoma.com.
-;1	IN	PTR	safeharbor.local.hitoma.com.
 1       IN      PTR     canon.local.hitoma.com.
 1       IN      PTR     nas.local.hitoma.com.
 1       IN      PTR     hubitat.local.hitoma.com.
 1       IN      PTR     ca.local.hitoma.com.
-;1       IN      PTR     octopi.local.hitoma.com.
+1       IN      PTR     octopi.local.hitoma.com.

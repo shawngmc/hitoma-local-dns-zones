@@ -1,17 +1,10 @@
-# This is a basic workflow to help you get started with Actions
-
 name: Verify and Publish
-
-# Controls when the action will run. 
 on:
   # Triggers the workflow on push or pull request events but only for the main branch
   push:
     branches: [ develop ]
-
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
-
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   createpr:
     runs-on: ubuntu-latest
@@ -20,19 +13,16 @@ jobs:
         uses: actions/checkout@v2
         with:
           ref: main
-          
       - name: Reset Branch To Force Change Detection
         run: |
           git fetch origin develop:develop
           git reset --hard develop
-          
-      # Create a pull request
       - name: Create Pull Request
         id: cpr
         uses: peter-evans/create-pull-request@v3.8.2
         with:
           labels: ready
-  version:
+  verify: 
     needs: createpr
     runs-on: ubuntu-latest
     steps:
@@ -40,41 +30,17 @@ jobs:
         uses: actions/checkout@v2
         with:
           ref: create-pull-request/patch
-          
-      - name: Generate Timestamp
-        id: tstamp
-        run: echo "::set-output name=date::$(date +%s)"
-      
-      - name: Place Timestamp As Serial Number
-        run: |
-          cd $GITHUB_WORKSPACE/etc/bind
-          sed -i 's/SERIALNUMBERPLACEHOLDER/${{steps.tstamp.outputs.date}}/g' *
-          
-      - name: Commit Serial-stamped Files
-        run: |
-          cd $GITHUB_WORKSPACE
-          git config user.email "shawngmc@gmail.com"
-          git config user.name "Shawn McNaughton (Github Action)"
-          git commit -a -m "Setting zone version to ${{steps.tstamp.outputs.date}}"
-          git push
-  verify: 
-    needs: version
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout PR
-        uses: actions/checkout@v2
-        with:
-          ref: create-pull-request/patch
-
       - name: Install Bind
         run: sudo apt install bind9 bind9utils
-
+      - name: Place Temporary Serial Number
+        run: |
+          cd $GITHUB_WORKSPACE/etc/bind
+          sed -i 's/SERIALNUMBERPLACEHOLDER/1000/g' *
       - name: Verify DNS Entry Validity
         run: $GITHUB_WORKSPACE/scripts/validate.sh
   promote:
     needs: verify
     runs-on: ubuntu-latest
-    steps:
       - name: Integration check
         uses: squalrus/merge-bot@v0.1.0
         with:
@@ -86,34 +52,40 @@ jobs:
           checks_enabled: true
           method: squash
           delete_source_branch: true
-#       - name: merge a pull request without any need of a label (automatic merge)
-#         uses: sudo-bot/action-pull-request-merge@v1.1.1
-#         with:
-#           github-token: ${{ secrets.GITHUB_TOKEN }}
-#           number: ${{ steps.cpr.outputs.pull-request-number }}
-#           allowed-usernames-regex: ^shawngmc$
-
-#       - name: Auto-Merge Pull Request
-#         uses: reitermarkus/automerge@v1.5.1
-#         with:
-#           pull-request: ${{ steps.cpr.outputs.pull-request-number }}
-
-#       - name: Merge and Close PR
-#         uses: davideviolante/pr-automerge-action@v1.2.1
-#         env:
-#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#         with:
-#           merge-method: 'squash'
-#           min-approvals: 0
-#           base-ref: 'main'
-
-
-
-#       - name: Push the verified zones to main
-#         run: |
-#           cd $GITHUB_WORKSPACE
-#           git commit -a -m "Pushing verified zones ${{steps.tstamp.outputs.date}}"
-#           git push
-#           git tag -a "v${{steps.tstamp.outputs.date}}" -m "Verified release ${{steps.tstamp.outputs.date}}"
-#           git push origin "v${{steps.tstamp.outputs.date}}"
-          
+  release:
+    needs: promote
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Project
+        uses: actions/checkout@v2
+        with:
+          ref: main
+      - name: Generate Timestamp
+        id: tstamp
+        run: |
+          echo "::set-output name=epochdate::$(date +%s)"
+          echo "::set-output name=semverdate::$(date +%Y%m%d.%H%M.%S)"
+      - name: Place Timestamp As Serial Number
+        run: |
+          cd $GITHUB_WORKSPACE/etc/bind/
+          echo ${{steps.tstamp.outputs.epochdate}}
+          cat hitoma.com.db
+          sed -i 's/SERIALNUMBERPLACEHOLDER/${{steps.tstamp.outputs.epochdate}}/g' *
+          cat hitoma.com.db
+      - name: Make Archive
+        run: |
+          cd $GITHUB_WORKSPACE
+          mkdir builds
+          tar -czvf builds/zones.tar.gz ./etc
+      - name: Create Release
+        uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "latest"
+          prerelease: false
+          title: 'DNS Zones v${{ steps.tstamp.outputs.semverdate }}.${{ steps.tstamp.outputs.epochdate }}'
+          files: |
+            builds/zones.tar.gz
+      - name: Timestamp debug
+        run: |
+          echo ${{steps.tstamp.outputs.epochdate}}
