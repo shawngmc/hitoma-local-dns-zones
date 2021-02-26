@@ -41,6 +41,7 @@ jobs:
   promote:
     needs: verify
     runs-on: ubuntu-latest
+    steps:
       - name: Integration check
         uses: squalrus/merge-bot@v0.1.0
         with:
