@@ -1,55 +1,32 @@
 name: Verify and Publish
+
 on:
-  # Triggers the workflow on push or pull request events but only for the main branch
-  push:
-    branches: [ develop ]
+  pull_request:
+    types:
+      - labeled
+      - ready_for_review
+      - review_request_removed
+      - review_requested
+      - synchronize
+      - unlabeled
+  pull_request_review:
+    types:
+      - dismissed
+      - submitted
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 jobs:
-  createpr:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Project
-        uses: actions/checkout@v2
-        with:
-          ref: main
-      - name: Reset Branch To Force Change Detection
-        run: |
-          git fetch origin develop:develop
-          git reset --hard develop
-      - name: Create Pull Request
-        id: cpr
-        uses: peter-evans/create-pull-request@v3.8.2
-        with:
-          labels: ready
-  verify: 
-    needs: createpr
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout PR
-        uses: actions/checkout@v2
-        with:
-          ref: create-pull-request/patch
-      - name: Install Bind
-        run: sudo apt install bind9 bind9utils
-      - name: Place Temporary Serial Number
-        run: |
-          cd $GITHUB_WORKSPACE/etc/bind
-          sed -i 's/SERIALNUMBERPLACEHOLDER/1000/g' *
-      - name: Verify DNS Entry Validity
-        run: $GITHUB_WORKSPACE/scripts/validate.sh
   promote:
-    needs: verify
     runs-on: ubuntu-latest
     steps:
       - name: Integration check
         uses: squalrus/merge-bot@v0.4.4
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          test: true
+          test: false
           reviewers: false
-          labels:
-          blocking_labels:
+          labels: ""
+          blocking_labels: ""
           checks_enabled: true
           method: squash
           delete_source_branch: true
