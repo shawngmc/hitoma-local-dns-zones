@@ -1,25 +1,9 @@
 name: Promote
-
 on:
-  pull_request:
-    branches: [ develop ]
-  # Allows you to run this workflow manually from the Actions tab
+  push:
+    branches: [ main ]
   workflow_dispatch:
 jobs:
-  promote:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Integration check
-        uses: squalrus/merge-bot@v0.4.4
-        with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          test: false
-          reviewers: false
-          labels: ""
-          blocking_labels: ""
-          checks_enabled: true
-          method: squash
-          delete_source_branch: true
   release:
     needs: promote
     runs-on: ubuntu-latest
